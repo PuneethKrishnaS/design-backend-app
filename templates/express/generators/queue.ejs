@@ -1,0 +1,8 @@
+import { createQueue, createQueueEvents } from '../config/queue';
+
+export const <%= moduleName %>Queue = createQueue('<%= moduleName %>');
+export const <%= moduleName %>QueueEvents = createQueueEvents('<%= moduleName %>');
+
+export const add<%= ModuleName %>Job = async (data: any) => {
+  return await <%= moduleName %>Queue.add('<%= moduleName %>Job', data);
+};

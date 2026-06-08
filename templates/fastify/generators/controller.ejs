@@ -1,0 +1,109 @@
+import { FastifyRequest, FastifyReply } from 'fastify';
+
+<% if (crud) { %>
+<% if (config.orm === 'prisma') { %>
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
+<% } else if (config.orm === 'mongoose') { %>
+import { <%= ModuleName %> } from '../models/<%= moduleName %>.model'; // Ensure this model exists
+<% } else if (config.orm === 'sequelize') { %>
+import { <%= ModuleName %> } from '../models/<%= moduleName %>.model'; // Ensure this model exists
+<% } %>
+
+export const create<%= ModuleName %> = async (request: FastifyRequest, reply: FastifyReply) => {
+  try {
+<% if (config.orm === 'prisma') { %>
+    const new<%= ModuleName %> = await prisma.<%= moduleName %>.create({ data: request.body as any });
+    reply.code(201).send(new<%= ModuleName %>);
+<% } else if (config.orm === 'mongoose') { %>
+    const new<%= ModuleName %> = await <%= ModuleName %>.create(request.body);
+    reply.code(201).send(new<%= ModuleName %>);
+<% } else if (config.orm === 'sequelize') { %>
+    const new<%= ModuleName %> = await <%= ModuleName %>.create(request.body as any);
+    reply.code(201).send(new<%= ModuleName %>);
+<% } else { %>
+    reply.code(201).send({ message: 'Create <%= moduleName %>', data: request.body });
+<% } %>
+  } catch (error: any) {
+    reply.code(400).send({ error: error.message });
+  }
+};
+
+export const get<%= ModuleName %>s = async (request: FastifyRequest, reply: FastifyReply) => {
+  try {
+<% if (config.orm === 'prisma') { %>
+    const items = await prisma.<%= moduleName %>.findMany();
+    reply.code(200).send(items);
+<% } else if (config.orm === 'mongoose') { %>
+    const items = await <%= ModuleName %>.find();
+    reply.code(200).send(items);
+<% } else if (config.orm === 'sequelize') { %>
+    const items = await <%= ModuleName %>.findAll();
+    reply.code(200).send(items);
+<% } else { %>
+    reply.code(200).send({ message: 'Get all <%= moduleName %>s' });
+<% } %>
+  } catch (error: any) {
+    reply.code(500).send({ error: error.message });
+  }
+};
+
+export const get<%= ModuleName %>ById = async (request: FastifyRequest, reply: FastifyReply) => {
+  try {
+    const { id } = request.params as { id: string };
+<% if (config.orm === 'prisma') { %>
+    const item = await prisma.<%= moduleName %>.findUnique({ where: { id } });
+<% } else if (config.orm === 'mongoose') { %>
+    const item = await <%= ModuleName %>.findById(id);
+<% } else if (config.orm === 'sequelize') { %>
+    const item = await <%= ModuleName %>.findByPk(id);
+<% } else { %>
+    const item = { id, message: `Get <%= moduleName %>` };
+<% } %>
+    if (!item) return reply.code(404).send({ error: 'Not found' });
+    reply.code(200).send(item);
+  } catch (error: any) {
+    reply.code(500).send({ error: error.message });
+  }
+};
+
+export const update<%= ModuleName %> = async (request: FastifyRequest, reply: FastifyReply) => {
+  try {
+    const { id } = request.params as { id: string };
+<% if (config.orm === 'prisma') { %>
+    const updated = await prisma.<%= moduleName %>.update({ where: { id }, data: request.body as any });
+<% } else if (config.orm === 'mongoose') { %>
+    const updated = await <%= ModuleName %>.findByIdAndUpdate(id, request.body, { new: true });
+<% } else if (config.orm === 'sequelize') { %>
+    const [updatedCount] = await <%= ModuleName %>.update(request.body as any, { where: { id } });
+    if (updatedCount === 0) return reply.code(404).send({ error: 'Not found' });
+    const updated = await <%= ModuleName %>.findByPk(id);
+<% } else { %>
+    const updated = { id, ...(request.body as any) };
+<% } %>
+    reply.code(200).send(updated);
+  } catch (error: any) {
+    reply.code(400).send({ error: error.message });
+  }
+};
+
+export const delete<%= ModuleName %> = async (request: FastifyRequest, reply: FastifyReply) => {
+  try {
+    const { id } = request.params as { id: string };
+<% if (config.orm === 'prisma') { %>
+    await prisma.<%= moduleName %>.delete({ where: { id } });
+<% } else if (config.orm === 'mongoose') { %>
+    await <%= ModuleName %>.findByIdAndDelete(id);
+<% } else if (config.orm === 'sequelize') { %>
+    await <%= ModuleName %>.destroy({ where: { id } });
+<% } %>
+    reply.code(204).send();
+  } catch (error: any) {
+    reply.code(500).send({ error: error.message });
+  }
+};
+<% } else { %>
+export const example<%= ModuleName %>Action = async (request: FastifyRequest, reply: FastifyReply) => {
+  reply.code(200).send({ message: '<%= moduleName %> action successful' });
+};
+<% } %>

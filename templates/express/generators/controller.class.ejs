@@ -1,0 +1,109 @@
+import { Request, Response } from 'express';
+<% if (crud) { %>
+<% if (config.orm === 'prisma') { %>
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
+<% } else if (config.orm === 'mongoose') { %>
+import { <%= ModuleName %> } from '../../models/<%= moduleName %>.model'; // Ensure this model exists
+<% } else if (config.orm === 'sequelize') { %>
+import { <%= ModuleName %> } from '../../models/<%= moduleName %>.model'; // Ensure this model exists
+<% } %>
+
+export class <%= ModuleName %>Controller {
+  async create(req: Request, res: Response) {
+    try {
+<% if (config.orm === 'prisma') { %>
+      const new<%= ModuleName %> = await prisma.<%= moduleName %>.create({ data: req.body });
+      res.status(201).json(new<%= ModuleName %>);
+<% } else if (config.orm === 'mongoose') { %>
+      const new<%= ModuleName %> = await <%= ModuleName %>.create(req.body);
+      res.status(201).json(new<%= ModuleName %>);
+<% } else if (config.orm === 'sequelize') { %>
+      const new<%= ModuleName %> = await <%= ModuleName %>.create(req.body);
+      res.status(201).json(new<%= ModuleName %>);
+<% } else { %>
+      res.status(201).json({ message: 'Create <%= moduleName %>', data: req.body });
+<% } %>
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+
+  async getAll(req: Request, res: Response) {
+    try {
+<% if (config.orm === 'prisma') { %>
+      const items = await prisma.<%= moduleName %>.findMany();
+      res.status(200).json(items);
+<% } else if (config.orm === 'mongoose') { %>
+      const items = await <%= ModuleName %>.find();
+      res.status(200).json(items);
+<% } else if (config.orm === 'sequelize') { %>
+      const items = await <%= ModuleName %>.findAll();
+      res.status(200).json(items);
+<% } else { %>
+      res.status(200).json({ message: 'Get all <%= moduleName %>s' });
+<% } %>
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getById(req: Request, res: Response) {
+    try {
+<% if (config.orm === 'prisma') { %>
+      const item = await prisma.<%= moduleName %>.findUnique({ where: { id: req.params.id } });
+<% } else if (config.orm === 'mongoose') { %>
+      const item = await <%= ModuleName %>.findById(req.params.id);
+<% } else if (config.orm === 'sequelize') { %>
+      const item = await <%= ModuleName %>.findByPk(req.params.id);
+<% } else { %>
+      const item = { id: req.params.id, message: `Get <%= moduleName %>` };
+<% } %>
+      if (!item) return res.status(404).json({ error: 'Not found' });
+      res.status(200).json(item);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async update(req: Request, res: Response) {
+    try {
+<% if (config.orm === 'prisma') { %>
+      const updated = await prisma.<%= moduleName %>.update({ where: { id: req.params.id }, data: req.body });
+<% } else if (config.orm === 'mongoose') { %>
+      const updated = await <%= ModuleName %>.findByIdAndUpdate(req.params.id, req.body, { new: true });
+<% } else if (config.orm === 'sequelize') { %>
+      const [updatedCount] = await <%= ModuleName %>.update(req.body, { where: { id: req.params.id } });
+      if (updatedCount === 0) return res.status(404).json({ error: 'Not found' });
+      const updated = await <%= ModuleName %>.findByPk(req.params.id);
+<% } else { %>
+      const updated = { id: req.params.id, ...req.body };
+<% } %>
+      res.status(200).json(updated);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+
+  async delete(req: Request, res: Response) {
+    try {
+<% if (config.orm === 'prisma') { %>
+      await prisma.<%= moduleName %>.delete({ where: { id: req.params.id } });
+<% } else if (config.orm === 'mongoose') { %>
+      await <%= ModuleName %>.findByIdAndDelete(req.params.id);
+<% } else if (config.orm === 'sequelize') { %>
+      await <%= ModuleName %>.destroy({ where: { id: req.params.id } });
+<% } %>
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+}
+<% } else { %>
+export class <%= ModuleName %>Controller {
+  async handle(req: Request, res: Response) {
+    res.status(200).json({ message: '<%= moduleName %> action successful' });
+  }
+}
+<% } %>

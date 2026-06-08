@@ -1,0 +1,28 @@
+
+export class <%= ModuleName %>Service {
+<% if (crud) { %>
+  public async create(data: any) {
+    return { id: 'uuid', ...data };
+  }
+
+  public async findAll() {
+    return [];
+  }
+
+  public async findById(id: string) {
+    return { id };
+  }
+
+  public async update(id: string, data: any) {
+    return { id, ...data };
+  }
+
+  public async delete(id: string) {
+    return true;
+  }
+<% } else { %>
+  public async execute() {
+    return { success: true };
+  }
+<% } %>
+}

@@ -1,0 +1,40 @@
+{
+  "name": "design-backend-app",
+  "version": "1.1.1",
+  "description": "Intelligent Backend Architecture Generator",
+  "main": "./dist/index.js",
+  "bin": {
+    "design-backend-app": "./dist/index.js",
+    "devforge": "./dist/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@inquirer/prompts": "^8.5.2",
+    "chalk": "^4.1.2",
+    "commander": "^15.0.0",
+    "ejs": "^6.0.1",
+    "fs-extra": "^11.3.5",
+    "ora": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/ejs": "^3.1.5",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^25.9.2",
+    "eslint": "^10.4.1",
+    "prettier": "^3.8.3",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3"
+  }
+}

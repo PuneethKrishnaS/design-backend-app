@@ -1,0 +1,7 @@
+node_modules/
+dist/
+my/
+test/
+*.log
+.env
+.devforge.json

@@ -1,0 +1,17 @@
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '<%= sequelizePath %>/sequelize';
+
+export class <%= ModuleName %> extends Model {}
+
+<%= ModuleName %>.init({
+  id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+<% if (moduleName.toLowerCase() === 'users' || moduleName.toLowerCase() === 'auth') { %>
+  email: { type: DataTypes.STRING, allowNull: false, unique: true },
+  password: { type: DataTypes.STRING, allowNull: false },
+  name: { type: DataTypes.STRING },
+  role: { type: DataTypes.STRING, defaultValue: 'user' }
+<% } else { %>
+  name: { type: DataTypes.STRING, allowNull: false },
+  description: { type: DataTypes.STRING }
+<% } %>
+}, { sequelize, modelName: '<%= ModuleName %>' });

@@ -1,0 +1,63 @@
+import { FastifyInstance } from 'fastify';
+<% if (crud) { %>import { create<%= ModuleName %>, get<%= ModuleName %>s, get<%= ModuleName %>ById, update<%= ModuleName %>, delete<%= ModuleName %> } from './<%= moduleName %>.controller';<% } else { %>import { example<%= ModuleName %>Action } from './<%= moduleName %>.controller';<% } %>
+
+export async function <%= moduleName %>Router(fastify: FastifyInstance) {
+<%
+  let preHandlers = [];
+  if (config.auth === 'jwt') preHandlers.push('(fastify as any).authenticate');
+  
+  let adminHandlers = [...preHandlers];
+  if (config.rbac && config.roles && config.roles.length > 0) {
+    let highestRole = config.roles[config.roles.length - 1];
+    adminHandlers.push(`(fastify as any).authorize(['${highestRole}'])`);
+  }
+  
+  let authStr = preHandlers.length > 0 ? `preHandler: [${preHandlers.join(', ')}], ` : '';
+  let adminStr = adminHandlers.length > 0 ? `preHandler: [${adminHandlers.join(', ')}], ` : '';
+%>
+<% if (crud) { %>
+  fastify.post('/', {
+    <%- adminStr %>schema: {
+      summary: 'Create a new <%= moduleName %>',
+      description: 'Creates a new <%= moduleName %> in the database.'
+    }
+  }, create<%= ModuleName %>);
+
+  fastify.get('/', {
+    <%- authStr %>schema: {
+      summary: 'Retrieve a list of <%= moduleName %>s',
+      description: 'Fetches all <%= moduleName %>s from the database.'
+    }
+  }, get<%= ModuleName %>s);
+
+  fastify.get('/:id', {
+    <%- authStr %>schema: {
+      summary: 'Retrieve a <%= moduleName %> by ID',
+      description: 'Fetches a specific <%= moduleName %> by ID from the database.',
+      params: { type: 'object', properties: { id: { type: 'string' } } }
+    }
+  }, get<%= ModuleName %>ById);
+
+  fastify.put('/:id', {
+    <%- adminStr %>schema: {
+      summary: 'Update a <%= moduleName %> by ID',
+      description: 'Updates a specific <%= moduleName %> by ID in the database.',
+      params: { type: 'object', properties: { id: { type: 'string' } } }
+    }
+  }, update<%= ModuleName %>);
+
+  fastify.delete('/:id', {
+    <%- adminStr %>schema: {
+      summary: 'Delete a <%= moduleName %> by ID',
+      description: 'Deletes a specific <%= moduleName %> by ID from the database.',
+      params: { type: 'object', properties: { id: { type: 'string' } } }
+    }
+  }, delete<%= ModuleName %>);
+<% } else { %>
+  fastify.get('/', {
+    <%- authStr %>schema: {
+      summary: 'Example endpoint for <%= moduleName %>'
+    }
+  }, example<%= ModuleName %>Action);
+<% } %>
+}

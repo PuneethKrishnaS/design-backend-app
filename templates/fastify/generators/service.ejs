@@ -1,0 +1,26 @@
+
+<% if (crud) { %>
+export const create<%= ModuleName %>Service = async (data: any) => {
+  return { id: 1, ...data };
+};
+
+export const get<%= ModuleName %>sService = async () => {
+  return [];
+};
+
+export const get<%= ModuleName %>ByIdService = async (id: string) => {
+  return { id };
+};
+
+export const update<%= ModuleName %>Service = async (id: string, data: any) => {
+  return { id, ...data };
+};
+
+export const delete<%= ModuleName %>Service = async (id: string) => {
+  return true;
+};
+<% } else { %>
+export const perform<%= ModuleName %>Service = async () => {
+  return { success: true };
+};
+<% } %>

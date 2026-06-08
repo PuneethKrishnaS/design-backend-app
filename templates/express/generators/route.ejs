@@ -1,0 +1,123 @@
+import { Router } from 'express';
+<% if (crud) { %>import { create<%= ModuleName %>, get<%= ModuleName %>s, get<%= ModuleName %>ById, update<%= ModuleName %>, delete<%= ModuleName %> } from './<%= moduleName %>.controller';<% } else { %>import { example<%= ModuleName %>Action } from './<%= moduleName %>.controller';<% } %>
+
+<%
+  let authMiddleware = '';
+  if (config.auth === 'jwt') authMiddleware = 'authenticate, ';
+  
+  let adminMiddleware = '';
+  if (config.rbac && config.roles && config.roles.length > 0) {
+    let highestRole = config.roles[config.roles.length - 1];
+    adminMiddleware = `authorize(['${highestRole}']), `;
+  }
+%>
+<% if (config.auth === 'jwt') { %>
+import { authenticate<%= config.rbac ? ', authorize' : '' %> } from '<%= middlewarePath %>/auth';
+<% } else if (config.auth === 'session' && config.rbac) { %>
+import { authorize } from '<%= middlewarePath %>/session';
+<% } %>
+
+export const <%= moduleName %>Router = Router();
+
+<% if (crud) { %>
+/**
+ * @openapi
+ * /api/<%= moduleName %>:
+ *   post:
+ *     tags:
+ *       - <%= ModuleName %>
+ *     summary: Create a new <%= moduleName %>
+ *     description: Creates a new <%= moduleName %> in the database.
+ *     responses:
+ *       201:
+ *         description: Successfully created.
+ */
+<%= moduleName %>Router.post('/', <%- authMiddleware %><%- adminMiddleware %>create<%= ModuleName %>);
+
+/**
+ * @openapi
+ * /api/<%= moduleName %>:
+ *   get:
+ *     tags:
+ *       - <%= ModuleName %>
+ *     summary: Retrieve a list of <%= moduleName %>s
+ *     description: Fetches all <%= moduleName %>s from the database.
+ *     responses:
+ *       200:
+ *         description: Successfully returned a list of <%= moduleName %>s.
+ */
+<%= moduleName %>Router.get('/', <%- authMiddleware %>get<%= ModuleName %>s);
+
+/**
+ * @openapi
+ * /api/<%= moduleName %>/{id}:
+ *   get:
+ *     tags:
+ *       - <%= ModuleName %>
+ *     summary: Retrieve a <%= moduleName %> by ID
+ *     description: Fetches a specific <%= moduleName %> by ID from the database.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully returned the <%= moduleName %>.
+ */
+<%= moduleName %>Router.get('/:id', <%- authMiddleware %>get<%= ModuleName %>ById);
+
+/**
+ * @openapi
+ * /api/<%= moduleName %>/{id}:
+ *   put:
+ *     tags:
+ *       - <%= ModuleName %>
+ *     summary: Update a <%= moduleName %> by ID
+ *     description: Updates a specific <%= moduleName %> by ID in the database.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully updated the <%= moduleName %>.
+ */
+<%= moduleName %>Router.put('/:id', <%- authMiddleware %><%- adminMiddleware %>update<%= ModuleName %>);
+
+/**
+ * @openapi
+ * /api/<%= moduleName %>/{id}:
+ *   delete:
+ *     tags:
+ *       - <%= ModuleName %>
+ *     summary: Delete a <%= moduleName %> by ID
+ *     description: Deletes a specific <%= moduleName %> by ID from the database.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully deleted the <%= moduleName %>.
+ */
+<%= moduleName %>Router.delete('/:id', <%- authMiddleware %><%- adminMiddleware %>delete<%= ModuleName %>);
+<% } else { %>
+/**
+ * @openapi
+ * /api/<%= moduleName %>:
+ *   get:
+ *     tags:
+ *       - <%= ModuleName %>
+ *     summary: Example endpoint for <%= moduleName %>
+ *     responses:
+ *       200:
+ *         description: Success
+ */
+<%= moduleName %>Router.get('/', <%- authMiddleware %>example<%= ModuleName %>Action);
+<% } %>

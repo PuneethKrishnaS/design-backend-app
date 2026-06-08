@@ -1,0 +1,7 @@
+import { Job } from 'bullmq';
+
+export default async function (job: Job) {
+  console.log(`Processing <%= moduleName %> job: ${job.id}`);
+  // Add your background job logic here
+  return { success: true };
+}
