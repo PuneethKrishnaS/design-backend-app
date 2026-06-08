@@ -17,8 +17,8 @@
     "templates"
   ],
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "PuneethKrishnaS",
+  "license": "MIT",
   "type": "commonjs",
   "dependencies": {
     "@inquirer/prompts": "^8.5.2",
